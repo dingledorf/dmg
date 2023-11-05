@@ -11,6 +11,19 @@ x-app: &default-app
     retries: 3
 
 services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+
   backend:
     <<: *default-app
     build:
@@ -26,6 +39,9 @@ services:
     volumes:
       - "./server:/node/app:delegated"
       - "/node/app/node_modules"
+    depends_on:
+      db:
+        condition: service_healthy
 
   frontend:
     <<: *default-app

@@ -34,7 +34,8 @@ describe('AuthController', () => {
       }
     })
     it('should return a cookie with jwt if valid credentials', async () => {
-      const resp = await request(AuthController.authenticateUser, {headers: {'Authorization': 'Basic ZG1nOmRtZ1Rlc3Q='}})
+      const auth = btoa(process.env.AUTH_USER + ':' + process.env.AUTH_PASSWORD)
+      const resp = await request(AuthController.authenticateUser, {headers: {'Authorization': `Basic ${auth}`}})
       expect(resp.cookies.jwt).to.exist
     })
   })

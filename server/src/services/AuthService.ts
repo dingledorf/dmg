@@ -1,6 +1,5 @@
 import {ApiError} from "../utils/utils";
 
-const config = require('config');
 const jwt = require('jsonwebtoken');
 
 export interface IAuthService {
@@ -9,10 +8,10 @@ export interface IAuthService {
 
 class AuthService implements IAuthService {
   async authenticateUser(user: string, pass: string): Promise<string> {
-    if(user === config.get('user') && pass === config.get('password')) {
+    if(user === process.env.AUTH_USER && pass === process.env.AUTH_PASSWORD) {
       return jwt.sign({
         user
-      }, config.get('jwtSecret'), { expiresIn: '24h' })
+      }, process.env.HMAC_SECRET, { expiresIn: '24h' })
     } else {
       throw new ApiError(401, 'Invalid credentials provided.');
     }

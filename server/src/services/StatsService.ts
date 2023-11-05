@@ -1,14 +1,16 @@
 import fetch from 'node-fetch';
-import {Hardware} from "services/HardwareService";
+import Hardware from "entities/Hardware";
+import dataSource from "../data-source";
 const fs = require('fs');
 
 const cache = require('../cache');
+const hardwareRepository = dataSource.getRepository(Hardware);
 
 type HardwareStats = {
   totalHashRate: number,
   activeMiners: number,
   miningRevenue: number,
-  topMiner: Hardware
+  topMiner: Hardware | null
 }
 
 export type Statistics = HardwareStats & {
@@ -52,17 +54,21 @@ class StatsService implements IStatsService {
   }
 
   private async fetchHardwareStats(): Promise<HardwareStats> {
-    const hardware = await HardwareService.fetchAllHardware();
+    const stats = await hardwareRepository.createQueryBuilder()
+      .select('COUNT(*) as "activeMiners"')
+      .addSelect('SUM("hashRate") as "totalHashRate"')
+      .getRawOne();
+
+    const topMiner = await hardwareRepository.createQueryBuilder()
+      .orderBy('"hashRate"', 'DESC')
+      .limit(1)
+      .getOne();
+
     return {
-      ...hardware.reduce((stats: {totalHashRate: number, activeMiners: number}, h: Hardware) => ({
-        totalHashRate: stats.totalHashRate + parseFloat(h.hashRate),
-        activeMiners: stats.activeMiners+1
-      }), {
-        totalHashRate: 0,
-        activeMiners: 0
-      }),
+      activeMiners: parseInt(stats.activeMiners),
+      totalHashRate: parseFloat(stats.totalHashRate),
       miningRevenue: JSON.parse(fs.readFileSync(__dirname + '/../data/statistics.json').toString()).miningRevenue,
-      topMiner: hardware.sort((a: Hardware, b: Hardware) => parseFloat(b.hashRate) - parseFloat(a.hashRate))[0] || null
+      topMiner
     };
   }
 

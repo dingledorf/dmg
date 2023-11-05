@@ -1,6 +1,0 @@
-{
-  "jwtSecret": "dmg-secret",
-  "user": "dmg",
-  "password": "dmgTest",
-  "clientUrl": "http://localhost:3000"
-}

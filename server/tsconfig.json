@@ -27,13 +27,20 @@
          "services/*": ["services/*"],
          "utils/*": ["utils/*"],
       },
+      "allowJs": true,
+      "forceConsistentCasingInFileNames": true,
+      "noImplicitThis": true,
+      "noImplicitAny": true,
+      "importHelpers": true,
+      "strictNullChecks": true,
+      "noUnusedLocals": false
    },
    "ts-node": {
       "files": true,
       "transpileOnly": false,
       "require": ["tsconfig-paths/register"]
    },
-   "include": ["./**/*.ts", "src/**/*.json", "./**/*.tsx", "./**/*.js"],
+   "include": ["./**/*.ts", "config/**/*.json", "src/**/*.json", "./**/*.tsx", "./**/*.js"],
    "exclude": [
       ".*",
       "../node_modules",

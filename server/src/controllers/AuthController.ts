@@ -1,6 +1,5 @@
 import {Handler} from "express";
-import {ApiError} from "../utils/utils";
-import config from "config";
+import {ApiError} from "utils/utils";
 
 const AuthService = new (require('services/AuthService'))()
 

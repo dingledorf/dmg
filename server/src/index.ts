@@ -1,3 +1,4 @@
+require('dotenv').config({ path: `.env.${process.env.APP_ENV}` })
 import * as bodyParser from "body-parser";
 import type {NextFunction, Request, Response} from "express";
 const { expressjwt } = require('express-jwt');
@@ -7,10 +8,19 @@ import * as HardwareController from './controllers/HardwareController';
 import * as AuthController from './controllers/AuthController'
 import * as StatsController from './controllers/StatsController'
 import "reflect-metadata";
+import dataSource from "data-source";
 require('express-async-errors');
-const config = require('config');
 const express = require('express');
 const app = express();
+
+dataSource
+  .initialize()
+  .then(() => {
+    console.log("Data Source has been initialized!")
+  })
+  .catch((err) => {
+    console.error("Error during Data Source initialization:", err)
+  })
 
 const jsonErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err);
@@ -25,7 +35,7 @@ const apiRouter = express
     origin: 'http://localhost:3000'
   }))
   .use(expressjwt({
-    secret: config.get("jwtSecret"),
+    secret: process.env.HMAC_SECRET,
     algorithms: ["HS256"],
     getToken: function fromHeaderOrQuerystring(req: Request) {
       if (

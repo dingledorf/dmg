@@ -1,17 +1,20 @@
 import "reflect-metadata"
-import { DataSource } from "typeorm"
-import { Hardware } from "entity/Hardware"
+import {DataSource} from "typeorm"
 
-export const AppDataSource = new DataSource({
+require('dotenv').config({ path: `.env.${process.env.APP_ENV}` })
+
+export default new DataSource({
     type: "postgres",
-    host: "localhost",
-    port: 5432,
-    username: "test",
-    password: "test",
-    database: "test",
+    host: process.env.TYPEORM_HOST,
+    port: parseInt(process.env.TYPEORM_PORT!),
+    username: process.env.TYPEORM_USER,
+    password: process.env.TYPEORM_PASS,
+    database: process.env.TYPEORM_DB,
     synchronize: true,
     logging: false,
-    entities: [Hardware],
-    migrations: [],
+    entities: [__dirname + "/entities/*.ts"],
+    migrations: [
+        __dirname + '/migrations/*.ts'
+    ],
     subscribers: [],
 })

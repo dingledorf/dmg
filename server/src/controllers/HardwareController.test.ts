@@ -1,6 +1,9 @@
+import dataSource from "../data-source";
+
 const HardwareService = require('services/HardwareService');
 import {json, request} from "../tests/express";
 import * as HardwareController from 'controllers/HardwareController';
+import Hardware from "../entities/Hardware";
 
 const sinon = require("sinon");
 const fs = require('fs');
@@ -93,15 +96,20 @@ describe('HardwareController', () => {
       }
     })
     it('should update the hardware and return it', async () => {
-      sinon.stub(fs, 'readFileSync').returns('[{"id": 41}]');
-      sinon.stub(fs, 'writeFileSync').callsFake(() => {});
-      const response = await json(HardwareController.updateHardware, {params: {id: "41"}, body: {
-            name: "Test",
+      const hardware = await dataSource.getRepository(Hardware).create({
+        name: "Test",
+        location: "Test",
+        hashRate: 12
+      }).save();
+
+      const response = await json(HardwareController.updateHardware, {params: {id: hardware.id}, body: {
+            name: "Updated",
             location: "Test",
-            hashRate: "34198234234.234"
+            hashRate: 120
           }});
-      expect(response.id).to.eq(41);
-      expect(response.name).to.eq('Test');
+      expect(response.id).to.eq(hardware.id);
+      expect(response.name).to.eq('Updated');
+      expect(response.hashRate).to.eq(120);
     })
   })
   describe('findHardware',  () => {
@@ -114,9 +122,14 @@ describe('HardwareController', () => {
       }
     })
     it('returns hardware if found', async () => {
-      sinon.stub(fs, 'readFileSync').returns('[{"id":1,"name":"Antminer S2","location":"Mining Facility C","hashRate":"95.473375856326211 TH/S"},{"id":2,"name":"Antminer S2","location":"Mining Facility A","hashRate":"63.124653604061336 TH/S"}]');
-      const resp = await json(HardwareController.findHardware, {params: {id: "2"}});
-      expect(resp.id).to.eq(2);
+      const hardware = await dataSource.getRepository(Hardware).create({
+        name: "Test",
+        location: "Test",
+        hashRate: 12
+      }).save();
+
+      const resp = await json(HardwareController.findHardware, {params: {id: hardware.id}});
+      expect(resp.id).to.eq(hardware.id);
     })
   })
   describe('getHardware',  () => {
@@ -142,14 +155,18 @@ describe('HardwareController', () => {
       }
     })
     it('should page results', async () => {
-      sinon.stub(fs, 'readFileSync').returns('[{"id": 1}]');
+      const hardware = await dataSource.getRepository(Hardware).create({
+        name: "Test",
+        location: "Test",
+        hashRate: 12
+      }).save();
       let resp = await json(HardwareController.getHardware, {query: {page: 1}});
-      expect(resp.hardware[0].id).to.equal(1);
+      expect(resp.hardware[0].id).to.equal(hardware.id);
       resp = await json(HardwareController.getHardware, {query: {page: 2}});
       expect(resp.hardware).to.be.empty
     })
     it('should filter results by name and location', async () => {
-      sinon.stub(fs, 'readFileSync').returns('[{"id":1,"name":"Antminer S2","location":"Mining Facility C","hashRate":"95.473375856326211 TH/S"},{"id":2,"name":"Antminer S2","location":"Mining Facility A","hashRate":"63.124653604061336 TH/S"},{"id":3,"name":"Antminer S3","location":"Mining Facility B","hashRate":"150.0160810465253 TH/S"},{"id":4,"name":"Antminer S4","location":"Mining Facility C","hashRate":"129.9991929861352 TH/S"}]');
+      await dataSource.getRepository(Hardware).insert([{"name":"Antminer S2","location":"Mining Facility C","hashRate":95.473375856326211},{"name":"Antminer S2","location":"Mining Facility A","hashRate":63.124653604061336},{"name":"Antminer S3","location":"Mining Facility B","hashRate":150.0160810465253},{"name":"Antminer S4","location":"Mining Facility C","hashRate":129.9991929861352}]);
       const resp = await json(HardwareController.getHardware, {query: {name: "Antminer S2", location: "Mining Facility A"}});
       expect(resp.hardware.length).to.eq(1);
       expect(resp.hardware[0].name).to.eq("Antminer S2")
@@ -158,7 +175,6 @@ describe('HardwareController', () => {
   })
   describe('deleteHardware',  () => {
     it('should throw a 404 error if not found', async () => {
-      sinon.stub(fs, 'readFileSync').returns('[{"id": 1}]');
       try {
         expect(await request(HardwareController.deleteHardware, {params: {id: "323"}})).to.eventually.throw;
       } catch (err: any) {
@@ -166,11 +182,14 @@ describe('HardwareController', () => {
       }
     })
     it('should return 200 if deleted', async () => {
-      sinon.stub(fs, 'readFileSync').returns('[{"id": 2}]');
-      const stub = sinon.stub(fs, 'writeFileSync').callsFake(() => {});
-      const resp = await request(HardwareController.deleteHardware, {params: {id: "2"}});
+      const hardware = await dataSource.getRepository(Hardware).create({
+        name: "Test",
+        location: "Test",
+        hashRate: 12
+      }).save();
+      const resp = await request(HardwareController.deleteHardware, {params: {id: hardware.id}});
       expect(resp.statusCode).to.eq(200);
-      expect(stub).to.have.been.called;
+      expect(dataSource.getRepository(Hardware).findOneBy({id: hardware.id})).to.be.eventually.null;
     })
   })
 })
