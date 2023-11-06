@@ -1,13 +1,19 @@
 import axios from 'helpers/axios';
 
-type Hardware = {
+export type Hardware = {
   id: number,
   location: string,
   name: string,
-  hashRate: string
+  hashRate: string,
+  createdAt: string,
+  updatedAt: string
 }
 
-type CreateOrUpdateRequest = Omit<Hardware, 'id' | 'hashRate'> & { hashRate: number };
+type CreateOrUpdateRequest = {
+  location: string,
+  name: string,
+  hashRate: number,
+}
 type GetRequest = {
   page?: number,
   name?: string,

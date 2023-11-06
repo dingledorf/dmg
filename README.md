@@ -7,6 +7,7 @@
 - create databases in postgres (1. dmg, 2. test)
 - npm install [on /client and /backend]
 - configure .env files inside of server directory (.env.development, .env.test)
+  - you may need to use "docker inspect" to find the IP of the postgres container, use this as the TYPEORM_HOST var
 - run migrations in /server folder for both dev and test environments
   - npm run migration:up
   - APP_ENV=test npm run migration:up
