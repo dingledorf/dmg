@@ -14,12 +14,22 @@
 - run docker-compose up
 
 ### Application
-
-- Access app on http://localhost:3000
-- User/Password combination under AUTH_USER and AUTH_PASSWORD env variables
-  - defaulted to dmg/dmgTest
-  - jwt saved as cookie
-- 3 pages for dashboard, hardware and analysis
+#### Frontend
+  - Frontend is a nextjs13 application using the App Router
+  - ui components are from https://mambaui.com/, tailwindcss built components for quick and simple use
+  - axios for http client
+  - 3 pages for dashboard, hardware and analysis
+  - Access app on http://localhost:3000
+  - User/Password combination under AUTH_USER and AUTH_PASSWORD env variables
+    - defaulted to dmg/dmgTest
+    - jwt saved as cookie and sent as a httpOnly credential
+#### Backend
+  - Express.js framework
+  - TypeORM using postgres db
+    - Migrations to setup db and seed data
+  - Mining revenue is read from mock data
+  - Controllers for API routes and Services for business logic
+  - Cache used for 3rd party api and hardware calls (in-memory cache so don't need to install redis)
 
 ### Unit Testing
 
