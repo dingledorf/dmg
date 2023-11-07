@@ -4,6 +4,7 @@
 
 - docker-compose.yml contains a postgres db service, you can remove this if you already have a postgres instance elsewhere, if you do then remove the depends_on config as well on the backend service
 - .env on the root folder contains ports for the docker containers, move these around as you wish, it is default configured to run on 3000 for frontend and 8080 for backend
+- run docker-compose build and start the postgres container if needed
 - create databases in postgres, if using the docker installation the user/pass should be postgres/postgres
   - "dmg" this is for the application
   - "test" this is for test environment
@@ -19,7 +20,6 @@
 - run migrations in /server folder for both dev and test environments
   - npm run migration:up
   - APP_ENV=test npm run migration:up
-- run docker-compose build
 - run docker-compose up
 
 ### Application
