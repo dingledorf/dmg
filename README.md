@@ -4,10 +4,18 @@
 
 - docker-compose.yml contains a postgres db service, you can remove this if you already have a postgres instance elsewhere, if you do then remove the depends_on config as well on the backend service
 - .env on the root folder contains ports for the docker containers, move these around as you wish, it is default configured to run on 3000 for frontend and 8080 for backend
-- create databases in postgres (1. dmg, 2. test)
+- create databases in postgres, if using the docker installation the user/pass should be postgres/postgres
+  - "dmg" this is for the application
+  - "test" this is for test environment
 - npm install [on /client and /backend]
 - configure .env files inside of server directory (.env.development, .env.test)
-  - you may need to use "docker inspect" to find the IP of the postgres container, use this as the TYPEORM_HOST var
+  - you may need to use "docker inspect [containername]" to find the IP of the postgres container, use this as the TYPEORM_HOST var
+  - if using your own postgres installation fill the following variables, otherwise it should just work
+    - TYPEORM_HOST = from docker inspect [containername] [or whatever your installation is configured to]
+      - in .env.test, because you will probably run the tests locally it should probably be localhost, otherwise if you run from the container it would be the same one as in .env.development
+    - TYPEORM_USER = postgres [or whatever your installation is configured to]
+    - TYPEORM_PASS = postgres [or whatever your installation is configured to]
+    - TYPEORM_PORT = 5432 [or whatever your installation is configured to]
 - run migrations in /server folder for both dev and test environments
   - npm run migration:up
   - APP_ENV=test npm run migration:up
